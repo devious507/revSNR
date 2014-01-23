@@ -1,7 +1,15 @@
 <?php
 
 require_once("Telnet.class.php");
-require_once("config.php");
+if(file_exists('config.php')) {
+	require_once("config.php");
+} else {
+	header("Content-type: text/plain");
+	print "Error: config.php must be created.  An Example of what is needed follows\n\n";
+	$data = file_get_contents('config.php.example');
+	print $data;
+	exit();
+}
 
 define("MAX_REPEAT",16);
 
