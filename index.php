@@ -125,10 +125,11 @@ function generateBody($snr,$auto_val) {
 		$body.="<tr><td colspan=\"{$col}\">Autorun in Progress: {$repeatCount} / {$maxRepeats}</td></tr>";
 	}
 	$body.="<tr><td bgcolor=\"{$color3}\">Interface&nbsp;</td>";
+	$body.="<td bgcolor=\"{$color3}\" align=\"right\">Avg&nbsp;</td>";
 	foreach($timeStamps as $stamp) {
 		$body.="<td bgcolor=\"{$color3}\" align=\"right\">&nbsp;&nbsp;{$stamp}</td>";
 	}
-	$body.="<td bgcolor=\"{$color3}\" align=\"right\">Avg&nbsp;</td></tr>";
+	$body.="</tr>";
 	foreach($snr as $s) {
 		$tot=0;
 		$avg_ct=0;
@@ -146,8 +147,6 @@ function generateBody($snr,$auto_val) {
 			$tot+=$e;
 			if($e > 0) {
 				$avg_ct+=1;
-				$fmt=sprintf("&nbsp;&nbsp;&nbsp;%.02f",$e);
-				$body.="\t<td align=\"right\" bgcolor=\"{$active_color}\">{$fmt}</td>\n";
 			}
 		}
 		if($avg_ct > 0) {
@@ -155,6 +154,12 @@ function generateBody($snr,$auto_val) {
 			$body.="\t<td align=\"right\" bgcolor=\"{$color3}\">&nbsp;&nbsp;&nbsp;{$avg}</td>\n";
 		} else {
 			$body.="\t<td align=\"right\" bgcolor=\"{$color3}\">&nbsp;&nbsp;&nbsp;0.00</td>\n";
+		}
+		foreach($s as $e) {
+			if($e > 0) {
+				$fmt=sprintf("&nbsp;&nbsp;&nbsp;%.02f",$e);
+				$body.="\t<td align=\"right\" bgcolor=\"{$active_color}\">{$fmt}</td>\n";
+			}
 		}
 		$body.="</tr>\n";
 		$count++;
