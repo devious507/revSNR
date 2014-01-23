@@ -2,7 +2,7 @@
 
 require_once("Telnet.class.php");
 
-define("MAX_REPEAT",30);
+define("MAX_REPEAT",16);
 
 $cmts_ip = '38.108.136.1';
 
@@ -119,11 +119,10 @@ function generateBody($snr,$auto_val) {
 	$lbls=getLabels();
 	$count=0;
 
-	if($auto_val == 'true') {
-		$body="Autorun in Progress: {$repeatCount} / {$maxRepeats}";
-		$body.="<table cellpadding=\"3\" cellspacing=\"0\" border=\"1\">\n";
-	} else {
 		$body="<table cellpadding=\"3\" cellspacing=\"0\" border=\"1\">\n";
+	if($auto_val == 'true') {
+		$col=$repeatCount+2;
+		$body.="<tr><td colspan=\"{$col}\">Autorun in Progress: {$repeatCount} / {$maxRepeats}</td></tr>";
 	}
 	$body.="<tr><td bgcolor=\"{$color3}\">Interface&nbsp;</td>";
 	foreach($timeStamps as $stamp) {
