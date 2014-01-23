@@ -116,7 +116,7 @@ function getRevSNR($snr) {
 		array_pop($snr[$i]);
 	}
 	global $timeStamps;
-	array_unshift($timeStamps,date('h:i:s'));
+	array_unshift($timeStamps,date('H:i:s'));
 	if(count($timeStamps) > 16) {
 		array_pop($timeStamps);
 	}
