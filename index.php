@@ -1,10 +1,14 @@
 <?php
 
 require_once("Telnet.class.php");
+require_once("config.php");
 
 define("MAX_REPEAT",16);
 
-$cmts_ip = '38.108.136.1';
+$cmts_ip = CMTS_IP;
+$cmts_port = CMTS_PORT;
+$cmts_pass1 = CMTS_PASS1;
+$cmts_pass2 = CMTS_PASS2;
 
 // SNR Array 16x16 elements
 
@@ -71,13 +75,16 @@ function getLabels() {
 }
 function getRevSNR($snr) {
 	global $cmts_ip;
-	$tel = new Telnet($cmts_ip,23,10,":");
+	global $cmts_port;
+	global $cmts_pass1;
+	global $cmts_pass2;
+	$tel = new Telnet($cmts_ip,$cmts_port,10,":");
 	$tel->setPrompt(">");
-	$tel->exec("gamester");
+	$tel->exec($cmts_pass1);
 	$tel->setPrompt(":");
 	$tel->exec("en");
 	$tel->setPrompt("#");
-	$tel->exec("renter30");
+	$tel->exec("$cmts_pass2");
 	$tel->setStreamTimeout(4);
 	$data =$tel->exec("show contr cable 3/0 | incl SNR");
 	$data.="\n";
