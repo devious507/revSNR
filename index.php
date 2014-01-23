@@ -119,10 +119,16 @@ function generateBody($snr,$auto_val) {
 	$lbls=getLabels();
 	$count=0;
 
-		$body="<table cellpadding=\"3\" cellspacing=\"0\" border=\"1\">\n";
+	$body="<table cellpadding=\"3\" cellspacing=\"0\" border=\"1\">\n";
 	if($auto_val == 'true') {
 		$col=$repeatCount+2;
 		$body.="<tr><td colspan=\"{$col}\">Autorun in Progress: {$repeatCount} / {$maxRepeats}</td></tr>";
+	} else {
+		$dateVal=date("F d, Y ");
+		$dateVal.="(All times ";
+		$dateVal.=date('T');
+		$dateVal.=")";
+		$body.="<tr><td colspan=\"18\">&nbsp;&nbsp;&nbsp;{$dateVal}</td></tr>\n";
 	}
 	$body.="<tr><td bgcolor=\"{$color3}\">Interface&nbsp;</td>";
 	$body.="<td bgcolor=\"{$color3}\" align=\"right\">Avg&nbsp;</td>";
