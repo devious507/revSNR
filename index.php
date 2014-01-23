@@ -1,6 +1,9 @@
 <?php
 
 require_once("Telnet.class.php");
+
+define("MAX_REPEAT",30);
+
 $cmts_ip = '38.108.136.1';
 
 // SNR Array 16x16 elements
@@ -22,13 +25,31 @@ if(!isset($_POST['snr'])) {
 			}
 		}
 	}
+	$timeStamps=array();
+	$repeatCount=0;
 } else {
 	$snr=json_decode($_POST['snr']);
+	$timeStamps=json_decode(base64_decode(($_POST['timestamps'])));
+	$repeatCount=$_POST['repeatCount'];
 }
 
+$repeatCount++;
+if($repeatCount >= MAX_REPEAT) {
+	$repeatCount=1;
+	$auto_val='false';
+}
+$js=getJS($auto_val);
 $snr=getRevSNR($snr);
 $body=generateBody($snr,$auto_val);
 
+function getJS($auto) {
+	if($auto == 'true') {
+		$js=file_get_contents('autoload.js');
+		return $js;
+	} else {
+		return '';
+	}
+}
 function getLabels() {
 	$lbl[]="C3/0/U0";
 	$lbl[]="C3/0/U1";
@@ -79,18 +100,36 @@ function getRevSNR($snr) {
 		array_unshift($snr[$i],$newVals[$i]);
 		array_pop($snr[$i]);
 	}
-	//print "<pre>"; var_dump($snr); print "</pre>"; exit();
-
+	global $timeStamps;
+	array_unshift($timeStamps,date('h:i:s'));
+	if(count($timeStamps) > 16) {
+		array_pop($timeStamps);
+	}
 	return $snr;
 }
 function generateBody($snr,$auto_val) {
+	global $timeStamps;
+	global $repeatCount;
+	global $auto_val;
+	$maxRepeats=MAX_REPEAT;
 	$color1="#ffffff";
 	$color2="#cacaca";
-	$color3="#00caca";
+	$color3="#fffacd";
 	$active_color=$color1;
 	$lbls=getLabels();
 	$count=0;
-	$body="<table cellpadding=\"3\" cellspacing=\"0\" border=\"1\">\n";
+
+	if($auto_val == 'true') {
+		$body="Autorun in Progress: {$repeatCount} / {$maxRepeats}";
+		$body.="<table cellpadding=\"3\" cellspacing=\"0\" border=\"1\">\n";
+	} else {
+		$body="<table cellpadding=\"3\" cellspacing=\"0\" border=\"1\">\n";
+	}
+	$body.="<tr><td bgcolor=\"{$color3}\">Interface&nbsp;</td>";
+	foreach($timeStamps as $stamp) {
+		$body.="<td bgcolor=\"{$color3}\" align=\"right\">&nbsp;&nbsp;{$stamp}</td>";
+	}
+	$body.="<td bgcolor=\"{$color3}\" align=\"right\">Avg&nbsp;</td></tr>";
 	foreach($snr as $s) {
 		$tot=0;
 		$avg_ct=0;
@@ -122,20 +161,30 @@ function generateBody($snr,$auto_val) {
 		$count++;
 	}
 	$json_snr=json_encode($snr);
+	$json_timestamps=base64_encode(json_encode($timeStamps));
 	$body.="</table>\n";
-	$body.="<form method=\"post\" action=\"index.php\">\n";
+	$body.="<form name=\"myForm\" id=\"myForm\" method=\"post\" action=\"index.php\">\n";
 	$body.="<input type=\"hidden\" name=\"snr\" value=\"{$json_snr}\">\n";
+	$body.="<input type=\"hidden\" name=\"timestamps\" value=\"{$json_timestamps}\">\n";
+	$body.="<input type=\"hidden\" name=\"repeatCount\" value=\"{$repeatCount}\">\n";
 	$body.="<input type=\"hidden\" name=\"auto\" value=\"{$auto_val}\">\n";
 	$body.="<input type=\"submit\" value=\"update\">\n";
 	$body.="</form>\n";
+	if($auto_val != 'true') {
+		$body.="<br><a href=\"index.php?auto=true\">Start Auto Updates</a>";
+	}
 	//$body.=$json_snr;
+	//$body.=$json_timestamps;
 	return $body;
 }
+
+//print "<pre>"; var_dump($timeStamps); "</pre>"; exit();
 
 ?>
 <html>
 <head>
 <title>RevSNR Watcher</title>
+<?php echo $js; ?>
 </head>
 <body>
 <?php echo $body; ?>
