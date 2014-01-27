@@ -36,9 +36,9 @@ foreach($snr as $s) {
 	$body.="<tr><td>{$iface}</td><td bgcolor=\"{$bgcolor}\"align=\"right\">&nbsp;&nbsp;{$avg}</td>";
 	foreach($s as $val) {
 		$abs=abs($val);
-		if($val < 1.5) {
+		if($abs < 1.5) {
 			$bgcolor="lightgreen";
-		} elseif($val <3) {
+		} elseif($abs < 3) {
 			$bgcolor="yellow";
 		} else {
 			$bgcolor="red";
