@@ -13,8 +13,6 @@ if(file_exists('config.php')) {
 	exit();
 }
 
-define("MAX_REPEAT",16);
-
 $cmts_ip = CMTS_IP;
 $cmts_port = CMTS_PORT;
 $cmts_pass1 = CMTS_PASS1;

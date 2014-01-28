@@ -50,6 +50,11 @@ foreach($snr as $s) {
 	$ct++;
 }
 
+$body.="<tr><td colspan=\"{$ct}\"><form method=\"post\" action=\"saveData.php\">\n";
+$body.="<input type=\"hidden\" name=\"snr\" value=\"{$_POST['snr']}\">\n";
+$body.="<input type=\"hidden\" name=\"timestamps\" value=\"{$_POST['timestamps']}\">\n";
+$body.="<input type=\"submit\" value=\"save\">\n";
+$body.="</form></td><td colspan=\"2\"><a href=\"index.php\">Back</a></td></tr>";
 $body.="</table>\n";
 
 

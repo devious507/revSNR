@@ -1,6 +1,7 @@
 <?php
 
 require_once("Telnet.class.php");
+define("MAX_REPEAT",16);
 
 function doAnalyze($snr) {
 	$rv=array();
@@ -103,11 +104,18 @@ function getRevSNR($snr) {
 	}
 	return $snr;
 }
-function generateBody($snr,$auto_val) {
+function generateBody($snr,$auto_val,$fname=' ') {
 	global $timeStamps;
 	global $repeatCount;
 	global $auto_val;
 	$maxRepeats=MAX_REPEAT;
+
+	if($fname!=' ') {
+		$fname=preg_replace("/^data\//","",$fname);
+		$tstamp=base64_decode($fname);
+		$tstamp=date('m/d/Y H:i:s',$tstamp);
+		$header="Generated: {$tstamp}";
+	}
 	$color1="#ffffff";
 	$color2="#cacaca";
 	$color3="#fffacd";
@@ -124,7 +132,11 @@ function generateBody($snr,$auto_val) {
 		$dateVal.="(All times ";
 		$dateVal.=date('T');
 		$dateVal.=")";
-		$body.="<tr><td colspan=\"18\">&nbsp;&nbsp;&nbsp;{$dateVal}</td></tr>\n";
+		if(isset($header)) {
+			$body.="<tr><td colspan=\"18\">&nbsp;&nbsp;&nbsp;{$header}</td></tr>\n";
+		} else {
+			$body.="<tr><td colspan=\"18\">&nbsp;&nbsp;&nbsp;{$dateVal}</td></tr>\n";
+		}
 	}
 	$body.="<tr><td bgcolor=\"{$color3}\">Interface&nbsp;</td>";
 	$body.="<td bgcolor=\"{$color3}\" align=\"right\">Avg&nbsp;</td>";
@@ -168,26 +180,33 @@ function generateBody($snr,$auto_val) {
 	}
 	$json_snr=base64_encode(json_encode($snr));
 	$json_timestamps=base64_encode(json_encode($timeStamps));
-	$body.="</table>\n";
-	$body.="<form name=\"myForm\" id=\"myForm\" method=\"post\" action=\"index.php\">\n";
+	// Update Form
+	$body.="<tr><td colspan=\"3\"><form name=\"myForm\" id=\"myForm\" method=\"post\" action=\"index.php\">\n";
 	$body.="<input type=\"hidden\" name=\"snr\" value=\"{$json_snr}\">\n";
 	$body.="<input type=\"hidden\" name=\"timestamps\" value=\"{$json_timestamps}\">\n";
 	$body.="<input type=\"hidden\" name=\"repeatCount\" value=\"{$repeatCount}\">\n";
 	$body.="<input type=\"hidden\" name=\"auto\" value=\"{$auto_val}\">\n";
 	$body.="<input type=\"submit\" value=\"update\">\n";
-	$body.="</form><br>\n";
-	$body.="</table>\n";
-	if($avg_ct == 16) {
-		$body.="<form name=\"myForm2\" id=\"myForm\" method=\"post\" action=\"analyze.php\">\n";
+	$body.="</form></td>\n";
+
+	if($avg_ct >= 4) {
+		// Analyze Form
+		$body.="<td colspan=\"3\"><form name=\"myForm2\" id=\"myForm\" method=\"post\" action=\"analyze.php\">\n";
 		$body.="<input type=\"hidden\" name=\"snr\" value=\"{$json_snr}\">\n";
 		$body.="<input type=\"hidden\" name=\"timestamps\" value=\"{$json_timestamps}\">\n";
 		$body.="<input type=\"hidden\" name=\"repeatCount\" value=\"{$repeatCount}\">\n";
 		$body.="<input type=\"hidden\" name=\"auto\" value=\"{$auto_val}\">\n";
 		$body.="<input type=\"submit\" value=\"Stability Analysis\">\n";
-		$body.="</form><br>\n";
+		$body.="</form></td>\n";
 	}
+
+	
+	if(($avg_ct != 1) && ($avg_ct != 4)) {
+		$body.="<td colspan=\"12\">&nbsp;</td></tr>\n";
+	}
+	$body.="</table>\n";
 	if($auto_val != 'true') {
-		$body.="<br><a href=\"index.php?auto=true\">Start Auto Updates</a>";
+		$body.="<br><a href=\"index.php?auto=true\">Start Auto Updates</a> | <a href=\"data/index.php\">Load Old Results</a>";
 	}
 	//$body.=$json_snr;
 	//$body.=$json_timestamps;
