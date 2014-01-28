@@ -11,7 +11,7 @@ $timestamps = json_decode(base64_decode($_POST['timestamps']));
 for($i=0; $i<16; $i++) {
 	$snr[$i]=doAnalyze($snr[$i]);
 }
-$body="<table cellpadding=\"5\" cellspacing=\"0\" border=\"1\">\n";
+$body="<table cellpadding=\"3\" cellspacing=\"0\" border=\"1\">\n";
 $body.="<tr><td colspan=\"18\">Reverse SNR Stability Analysis</td></tr>\n";
 $body.="<tr><td>Interface</td><td align=\"right\">Avg</td>";
 foreach($timestamps as $time) {
