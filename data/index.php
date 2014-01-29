@@ -17,7 +17,7 @@ while(($file=readdir($dh))!==false) {
 		break;
 	default:
 		$tstamp=base64_decode($file);
-		$myFiles[$tstamp]=$file;
+		$myFiles[$file]=$tstamp;
 		break;
 	}
 }
@@ -34,8 +34,8 @@ $baseUrl="http://".$server.implode("/",$data);
 
 arsort($myFiles);
 foreach($myFiles as $k=>$v) {
-	$time=date('m/d/Y H:i:s',$k);
-	$fname=urlencode($v);
+	$time=date('m/d/Y H:i:s',$v);
+	$fname=urlencode($k);
 	$urls[]="<li><a href=\"{$baseUrl}?fname=data/{$fname}\">{$time}</a></li>";
 }
 
